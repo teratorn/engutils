@@ -1,0 +1,96 @@
+README for Eng Utils
+
+USING ENG UTILS:
+
+    The only thing you need to do is run the setup program
+    for Eng Utils to install it on your computer. It will 
+    add Start Menu and Desktop icons for the program.
+
+    All the stuff it needs to run, including the Python
+    interpreter, is bundled in the installer.
+
+
+MAKING CHANGES TO ENG UTILS:
+
+    The installer will typically install to C:\EngUtils
+
+    This folder will contain another folder called EngUtils,
+    which contains the actual program source code.
+
+    So just go in to C:\EngUtils\EngUtils and you will see 
+    several files. The important files are:
+
+        utils.py - This contains the actual calculation functions, 
+                   and this is the file you modify to add
+                   another tab to the program.
+
+        common.py - Used by utils.py for setting up the graphical interface.
+                    You typically wont have to touch this file
+
+    You may make changes to these python files, and when you run
+    the program again, by double clicking C:\EngUtils\EngUtils.exe
+    or by using the desktop or start-menu icon, then your changes
+    should show up.
+
+    HOWEVER, you need to be careful, because if you modify these files,
+    then run "Setup Eng Utils.exe" again, the installer will overwrite
+    your changes with the files contained in the installer.
+
+    So...
+
+INCORPORATING CHANGES IN TO A NEW INSTALLER
+
+    Building a new installer program is fairly simple, and comprises
+    4 main steps:
+
+    1) Install development tools (only needed once).
+       Go in to the folder "INSTALL THESE" and double-click
+       the INSTALL.bat file. This should launch each necessary
+       setup program, one after the other. Complete each setup
+       program accepting all defaults.
+
+    2) Make changes to the Python files in the "EngUtils" folder which
+       is in the same folder as this readme file.
+
+       Test that your changes work by running Eng Utils from *this* folder.
+           (Not by using the installed version of Eng Utils.
+            I.e. don't click the desktop icon for Eng Utils and
+            expect changes made here to show up... The installed
+            version only uses the files in the installation directory,
+            typically C:\EngUtils\EngUtils.)
+
+       The way you run Eng Utils from THIS folder is by right-clicking
+       the main.py file and selecting "Edit with IDLE". This should
+       open main.py in a Python editing window.
+
+       Press F5 to run the program.
+
+    3) Update program version string.
+
+       There is a file called version.txt in the "EngUtils" folder (next
+       to all the python files) that contains the program version number.
+
+       Open version.txt in Notepad or some other text editor and increase
+       the version number to whatever you want. Typically just increment
+       the last part of the version number by one. e.g. 2.0.1 becomes 2.0.2
+
+       It won't cause problems if you omit this step - it's just good practice
+       to have a version number that is updated whenever the code is updated.
+
+    4) Rebuild the installer using the updated files.
+
+       Double-click the REBUILD_SETUP.py program. This should pop up a DOS box
+       and run through a series of automated steps which produces the 
+       installer.
+
+       Assuming REBUILD_SETUP.py reported success, there should now be a
+       "Setup Eng Utils.exe" file in the same folder as this readme file.
+
+       If "Setup Eng Utils.exe" was already there, it will have been
+       overwritten  with the new version.
+
+       This installer may be copied to any computer that you want to use
+       Eng Utils on.
+
+
+-Eric
