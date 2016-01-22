@@ -1,6 +1,6 @@
 import EngUtils
 
-from EngUtils.distribute_setup import use_setuptools
+from EngUtils.ez_setup import use_setuptools
 use_setuptools()
 from setuptools import setup
 
@@ -22,7 +22,7 @@ setup(name="EngUtils",
       version=versionString,
       description="GUI calculation screens for various Engineering functions",
       author="Eric P. Mangold",
-      author_email="eric@teratorn.org",
+      author_email="teratorn@gmail.com",
       packages=['EngUtils'],
       windows=[{'script' : 'main.py',
                 'icon_resources' : [(1, 'icon.ico')]
@@ -45,6 +45,9 @@ if sys.argv[1] == 'py2exe':
 
     icon = 'icon.ico'
     shutil.copyfile(icon, os.path.join('dist', icon))
+
+    lic = 'LICENSE.txt'
+    shutil.copyfile(lic, os.path.join('dist', lic))
 
     version_file = 'EngUtils/version.txt'
     shutil.copyfile(version_file, os.path.join('dist', version_file))
