@@ -136,6 +136,11 @@ class Configuration(object):
             self.save()
 
 
+def showAboutDialog():
+    msgBox = MsgBox(MsgBox.NoIcon, u"Engineering Utilities - About", u"Written by Eric P. Mangold - teratorn@gmail.com\n\nPlease contact for commercial licensing.")
+    msgBox.exec_()
+
+
 class Cleanlooks(QCleanlooksStyle):
     def styleHint(self, hint, option, widget, returnData):
         # change the color of table grid lines
@@ -197,6 +202,11 @@ class CalculatorApp(QApplication):
         floatPrecisionAction = optMenu.addAction("&Floating-point display precision...")
         floatPrecisionAction.setFont(F.std)
         connect(floatPrecisionAction, SIGNAL("triggered()"), config.promptFloatPrecision)
+
+        helpMenu = menuBar.addMenu("&Help")
+        aboutAction = helpMenu.addAction("&About...")
+        aboutAction.setFont(F.std)
+        connect(aboutAction, SIGNAL("triggered()"), showAboutDialog)
 
     def exec_(self):
         QTimer.singleShot(1000, self.checkFathersDay)
