@@ -22,7 +22,7 @@ setup(name="EngUtils",
       version=versionString,
       description="GUI calculation screens for various Engineering functions",
       author="Eric P. Mangold",
-      author_email="teratorn@gmail.com",
+      author_email="teratorn@zoho.com",
       packages=['EngUtils'],
       windows=[{'script' : 'main.py',
                 'icon_resources' : [(1, 'icon.ico')]
