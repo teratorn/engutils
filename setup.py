@@ -16,7 +16,6 @@ except ImportError:
 pkgDir = os.path.dirname(EngUtils.__file__)
 with open(os.path.join(pkgDir, 'version.txt'), 'r') as f:
     versionString = f.read().strip()
-    f.close
 
 setup(name="EngUtils",
       version=versionString,
