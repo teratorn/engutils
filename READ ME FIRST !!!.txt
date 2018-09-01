@@ -3,7 +3,7 @@ README for Eng Utils
 USING ENG UTILS:
 
     The only thing you need to do is run the setup program
-    for Eng Utils to install it on your computer. It will 
+    for Eng Utils to install it on your computer. It will
     add Start Menu and Desktop icons for the program.
 
     All the stuff it needs to run, including the Python
@@ -17,10 +17,10 @@ MAKING CHANGES TO ENG UTILS:
     This folder will contain another folder called EngUtils,
     which contains the actual program source code.
 
-    So just go in to C:\EngUtils\EngUtils and you will see 
+    So just go in to C:\EngUtils\EngUtils and you will see
     several files. The important files are:
 
-        utils.py - This contains the actual calculation functions, 
+        utils.py - This contains the actual calculation functions,
                    and this is the file you modify to add
                    another tab to the program.
 
@@ -80,7 +80,7 @@ INCORPORATING CHANGES IN TO A NEW INSTALLER
     4) Rebuild the installer using the updated files.
 
        Double-click the REBUILD_SETUP.py program. This should pop up a DOS box
-       and run through a series of automated steps which produces the 
+       and run through a series of automated steps which produces the
        installer.
 
        Assuming REBUILD_SETUP.py reported success, there should now be a
