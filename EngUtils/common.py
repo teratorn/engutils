@@ -174,10 +174,11 @@ class CalculatorApp(QApplication):
     def __init__(self, title):
         QApplication.__init__(self, [])
 
-        if not pyside2:
+        if pyside2:
+            QApplication.setStyle('Fusion')
+        else:
             style = Cleanlooks()
             QApplication.setStyle(style)
-
         global app, F, M, C, P, icon
         app = self
         F = Fonts()
