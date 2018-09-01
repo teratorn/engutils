@@ -3,8 +3,16 @@ from __future__ import division  # this causes interger division to return a flo
                                  # number instead of throwing away the remainder, if any.
 import traceback
 import datetime
-from PySide.QtCore import *
-from PySide.QtGui import *
+pyside2 = False
+try:
+    from PySide2.QtCore import *
+    from PySide2.QtGui import *
+    from PySide2.QtWidgets import *
+    pyside2 = True
+except ImportError:
+    from PySide.QtCore import *
+    from PySide.QtGui import *
+
 
 import os.path
 from ConfigParser import ConfigParser
@@ -34,7 +42,7 @@ class SingleEntryDialog(QDialog):
         hbox_layout = QHBoxLayout(hbox)
         hbox.setLayout(hbox_layout)
         vbox_layout.addWidget(hbox)
-        
+
         self.label = QLabel(description, self)
         hbox_layout.addWidget(self.label)
 
@@ -90,7 +98,7 @@ class Configuration(object):
         with open(self.configPath, 'r') as f:
             cfg = ConfigParser()
             cfg.readfp(f)
-            
+
             if cfg.has_section(self.section):
                 self.floatPrecision = cfg.getint(self.section, "floatPrecision")
 
@@ -100,7 +108,7 @@ class Configuration(object):
         """
         Save config to INI file
         """
-        
+
         # ensure config dir exists
         dirPath = os.path.dirname(self.configPath)
         if not os.path.exists(dirPath):
@@ -141,32 +149,34 @@ def showAboutDialog():
     msgBox.exec_()
 
 
-class Cleanlooks(QCleanlooksStyle):
-    def styleHint(self, hint, option, widget, returnData):
-        # change the color of table grid lines
-        if hint == QStyle.SH_Table_GridLineColor:
-            return int(C.grid_line.rgba() - 2**31)
-        return QCleanlooksStyle.styleHint(self, hint, option, widget, returnData)
+if not pyside2:
+    class Cleanlooks(QCleanlooksStyle):
+        def styleHint(self, hint, option, widget, returnData):
+            # change the color of table grid lines
+            if hint == QStyle.SH_Table_GridLineColor:
+                return int(C.grid_line.rgba() - 2**31)
+            return QCleanlooksStyle.styleHint(self, hint, option, widget, returnData)
 
-    def standardPixmap(self, *args):
-        """
-        Just a hack to prevent crash because calling menuBar() on the QMainWindow
-        results in a call to this method, for some reason, which if unimplemented,
-        results in error:
+        def standardPixmap(self, *args):
+            """
+            Just a hack to prevent crash because calling menuBar() on the QMainWindow
+            results in a call to this method, for some reason, which if unimplemented,
+            results in error:
 
-        NotImplementedError: pure virtual method 'QCleanlooksStyle.standardPixmap()' not implemented.
-        """
-        # just give it any old QPixmap to make it happy... doesn't appear
-        # to actually be displayed anywhere.
-        return QPixmap()
+            NotImplementedError: pure virtual method 'QCleanlooksStyle.standardPixmap()' not implemented.
+            """
+            # just give it any old QPixmap to make it happy... doesn't appear
+            # to actually be displayed anywhere.
+            return QPixmap()
 
 
 class CalculatorApp(QApplication):
     def __init__(self, title):
         QApplication.__init__(self, [])
 
-        style = Cleanlooks()
-        QApplication.setStyle(style)
+        if not pyside2:
+            style = Cleanlooks()
+            QApplication.setStyle(style)
 
         global app, F, M, C, P, icon
         app = self
@@ -177,7 +187,7 @@ class CalculatorApp(QApplication):
 
         global config
         config = Configuration()
-        
+
         main = self.main = QMainWindow()
         main.setFont( F.std )
         main.setWindowTitle(title)
@@ -247,14 +257,14 @@ class CalculatorApp(QApplication):
     def getFathersDay(self, year):
         june1 = datetime.date(year, 6, 1)
         june1dow = june1.weekday() # day of week integer for june1
- 
+
         # how far from sunday?
         daysBeforeSunday = 6 - june1dow # will be 0 if june1 is a Sunday
 
         fathersDay = datetime.date(year, 6, 1 + daysBeforeSunday + 14) # 3rd Sunday in June
         return fathersDay
 
-        
+
 class NotebookPage(QTabWidget):
     def __init__(self, parent, name, caption=None):
         QTabWidget.__init__(self)
@@ -269,24 +279,24 @@ class NotebookPage(QTabWidget):
             lbl = QLabel(caption, cw)
             cl.addWidget(lbl, 0, Qt.AlignCenter|Qt.AlignTop)
             cw.setLayout(cl)
-            
+
         w.setLayout(w_layout)
 
-        parent.addTab(w, name)      
-        
+        parent.addTab(w, name)
+
 
 class CalculatorPage(QWidget):
-    def __init__(self, parent, name, caption, *args):        
+    def __init__(self, parent, name, caption, *args):
         QWidget.__init__(self)
         self.setParent(parent)
         layout = QVBoxLayout(self)
-        
+
         self._name = name
         self._caption = caption
 
         self._entries = []
         self._outputs = []
-        
+
         for a in args:
             if isinstance(a, Entry):
                 self._entries.append(a)
@@ -294,7 +304,7 @@ class CalculatorPage(QWidget):
                 self._outputs.append(a)
             elif type(a) == type(smartEval):
                 self.calcFunction = a
-                        
+
         if isinstance(caption, QWidget):
             caption.postInit(self)
             layout.addWidget(caption, 0, Qt.AlignTop|Qt.AlignLeft)
@@ -316,11 +326,11 @@ class CalculatorPage(QWidget):
 
         gridl = QGridLayout(gridw)
         gridl.setVerticalSpacing(0)
-        
+
         row = 0
         col = 0
-        for entry in self._entries:                        
-            entry.postInit(gridw, gridl, row)           
+        for entry in self._entries:
+            entry.postInit(gridw, gridl, row)
             row += 1
 
         # a widget to hold the horizontal set of buttons
@@ -330,7 +340,7 @@ class CalculatorPage(QWidget):
         btnfrm_layout.setSpacing(5)
         gridl.addWidget(btnfrm, row, col+1, 1, 2, Qt.AlignLeft)
         row += 1
-        
+
         btn = QPushButton("Calculate", btnfrm)
         btnfrm_layout.addWidget(btn)
         btn.setFixedSize(btn.sizeHint())
@@ -351,7 +361,7 @@ class CalculatorPage(QWidget):
         lbl.setFont(F.big)
         lbl.setPalette(P.ready_text)
         gridl.addWidget(lbl, row, col)
-             
+
         row += 1
 
         for output in self._outputs:
@@ -364,15 +374,15 @@ class CalculatorPage(QWidget):
                 gridw = QWidget(hbox)
                 hbox_layout.addWidget(gridw)
                 gridl = QGridLayout(gridw)
-                                         
-            output.postInit(gridw, gridl, row)  
+
+            output.postInit(gridw, gridl, row)
             row += 1
 
         gridl.setColumnStretch(0,0)
         gridl.setColumnStretch(1,0)
         gridl.setColumnStretch(2,1)
 
-        self.statusLine = QLabel("Ready", self)        
+        self.statusLine = QLabel("Ready", self)
         layout.addWidget(self.statusLine, 0, Qt.AlignBottom|Qt.AlignLeft)
         self.statusLine.setFont(F.big)
         self.statusLine.setPalette(P.ready_text)
@@ -386,14 +396,14 @@ class CalculatorPage(QWidget):
 
     def doCalculation(self):
         entry_values = []
-        
+
         try:
             for entry in self._entries:
                 entry_values.append( entry.getValue() )
 
-            results = self.calcFunction(*entry_values)      
+            results = self.calcFunction(*entry_values)
 
-      
+
             #if results is not a tuple(ie, the function only returned one value),
             #change it into one to fit the processing code below
             if type(results) != tuple:
@@ -403,7 +413,7 @@ class CalculatorPage(QWidget):
                 raise TypeError, "Error: Calculation function returned %s values (expected %s)" % (len(results), len(self._outputs))
 
             #tell the output objects to display the results
-            for i in range(len(results)):          
+            for i in range(len(results)):
                 self._outputs[i].setValue( results[i] )
                 self._outputs[i].enableCopyButton()
 
@@ -412,7 +422,7 @@ class CalculatorPage(QWidget):
             self.statusLine.setPalette(P.err_text)
             print traceback.format_exc()
             return
-                
+
         #disable the entry boxes until the New button is clicked
         for entry in self._entries:
             entry.disable()
@@ -437,10 +447,10 @@ class CalculatorPage(QWidget):
         self.newProblem()
         for entry in self._entries:
             entry.clear()
-        
+
 
 def smartEval(s):
-    
+
     if not s:
         raise ValueError(err_string)
 
@@ -512,13 +522,13 @@ def smartEval(s):
             raise ValueError(err_string)
 
         return result
-    
-    else:  
+
+    else:
         try:
             return eval(s)
         except:
             raise ValueError(err_string)
-    
+
 
 class AutoEntry(QLineEdit):  #a line entry that has a minimum width (in characters), and expands when that is exceeded by typed in text
     def __init__(self, *args, **kwargs): # width=default, font=BoxFont
@@ -567,11 +577,11 @@ class EntryLine(Entry):
         frml = QHBoxLayout(frmw)
 
         layout.addWidget(frmw, row, 1, 1, 2, Qt.AlignLeft|Qt.AlignBottom)
-            
+
         self.box = AutoEntry(frmw)
         self.box.setText(self.default)
         frml.addWidget(self.box, 0, Qt.AlignLeft)
-                      
+
         lbl = QLabel(self.units, frmw)
         frml.addWidget(lbl, 0, Qt.AlignLeft)
         self.enable()
@@ -617,10 +627,10 @@ class OutputLine(Output):
         frml = QHBoxLayout(frmw)
 
         layout.addWidget(frmw, row, 1, Qt.AlignLeft|Qt.AlignBottom)
-            
+
         self.box = OutputBox(frmw)
         frml.addWidget(self.box, 0, Qt.AlignLeft)
-                      
+
         lbl = QLabel(self.units, frmw)
         frml.addWidget(lbl, 0, Qt.AlignLeft)
 
@@ -663,7 +673,7 @@ class MyEditorFilter(QObject):
             table = self._table
             row = table.currentRow()
             col = table.currentColumn()
-            key = event.key() 
+            key = event.key()
             if key in (Qt.Key_Return, Qt.Key_Enter):
                 # if on last row
                 if row == table.rowCount()-1:
@@ -685,7 +695,7 @@ class MyLineEdit(QLineEdit):
 
     def keyPressEvent(self, event):
         if event.type() == QEvent.KeyPress:
-            key = event.key() 
+            key = event.key()
             return QLineEdit.keyPressEvent(self, event)
 
             table = self._table
@@ -717,7 +727,7 @@ class MyStringEditorCreator(QItemEditorCreatorBase):
 
     def valuePropertyName(self):
         name = QItemEditorCreatorBase.valuePropertyName(self)
-        return name 
+        return name
 
 
 class MyItemEditorFactory(QItemEditorFactory):
@@ -725,10 +735,14 @@ class MyItemEditorFactory(QItemEditorFactory):
         self._table = table
         QItemEditorFactory.__init__(self)
 
-        self.registerEditor(str, MyStringEditorCreator(self._table))
-        self.registerEditor(unicode, MyStringEditorCreator(self._table))
+        if pyside2:
+            self.registerEditor(0, MyStringEditorCreator(self._table))
+            self.registerEditor(1, MyStringEditorCreator(self._table))
+        else:
+            self.registerEditor(str, MyStringEditorCreator(self._table))
+            self.registerEditor(unicode, MyStringEditorCreator(self._table))
 
-        
+
 class EntryTable(Entry, QTableWidget):
     """
     represents a spreadsheet like table for taking input, will auto create new rows as needed
@@ -742,7 +756,7 @@ class EntryTable(Entry, QTableWidget):
 
         self._read_only_flag = 0
         self._header_height = 27 #record these the first time we add a row. used later to ensure sizeHint is accurate.
-        self._row_height = 20 
+        self._row_height = 20
 
     def sizeHint(self):
         h = QTableWidget.sizeHint(self)
@@ -791,12 +805,12 @@ class EntryTable(Entry, QTableWidget):
     # ----- Begin personal methods
     def setCurrentCell(self, row, col):
         QTableWidget.setCurrentCell(self, row, col)
-        
+
     def setReadOnly(self, b):
         if b:
             self.currentItem().setSelected(False)
             self.setEnabled(False)
-            self._read_only_flag = 1        
+            self._read_only_flag = 1
         else:
             self.setEnabled(True)
             self._read_only_flag = 0
@@ -807,7 +821,7 @@ class EntryTable(Entry, QTableWidget):
         for i in range(self._num_cols):
             self.setItem(rows, i, QTableWidgetItem() )
         self.updateGeometry()
-        
+
     def clearLastRow(self):
         row = self.rowCount()-1
         for col in range(self.numCols()):
@@ -817,12 +831,12 @@ class EntryTable(Entry, QTableWidget):
         self.setCurrentCell(row-1, 0)
         self.ensureCellVisible(row-1, 0)
         self.verticalHeader().repaint() #erase the header buttons that were getting left behind
-        
+
     def headerResized(self, section, oldSize, newSize):
         self.updateGeometry()
-        
+
     # ----- Begin Entry interfaces -----
-    
+
     def postInit(self, parent, layout, row):
         #self.setGridStyle(Qt.DashDotDotLine)
         self.setFont(F.box)
@@ -851,18 +865,24 @@ class EntryTable(Entry, QTableWidget):
         mainw.setLayout(mainl)
 
         h = self.horizontalHeader()
-        h.setMovable(False)
+        if pyside2:
+            h.setSectionsMovable(False)
+        else:
+            h.setMovable(False)
 
         # TODO - fix this if it's actually necessary
         #connect(h, SIGNAL("sizeChange(int,int,int)"), self.headerResized)
-        
+
         self.setHorizontalHeaderLabels(self._col_names)
 
         h = self.verticalHeader()
-        h.setMovable(False)
-        
+        if pyside2:
+            h.setSectionsMovable(False)
+        else:
+            h.setMovable(False)
+
         self.appendRow()
-        
+
         layout.addWidget(mainw, row, 0, 1, 3, Qt.AlignLeft|Qt.AlignTop)
 
         self.enable()
@@ -879,7 +899,7 @@ class EntryTable(Entry, QTableWidget):
                 l.append( smartEval( str(item.text()) ) )
             r.append( tuple(l) )
         return tuple(r)
-    
+
     def enable(self):
         self.setPalette(P.normal)
         self.setReadOnly(0)
@@ -909,7 +929,7 @@ class Picture(QWidget):
         self.caption = caption
         self.orient = orient
 
-    def postInit(self, parent):      
+    def postInit(self, parent):
 	self.setParent(parent)
 
         pix = QPixmap()
@@ -917,7 +937,7 @@ class Picture(QWidget):
             if not pix.load( "images/" + self.file_name ):
                 print "Load of image, %s, failed!" % self.file_name
                 return
-        pic = QLabel(self)                   
+        pic = QLabel(self)
         pic.setPixmap(pix)
 
         if self.caption:
@@ -934,7 +954,7 @@ class Picture(QWidget):
                 box = QHBoxLayout(self)
                 if self.orient == "left":
                     box.addWidget(lbl)
-                    box.addWidget(pic)                    
+                    box.addWidget(pic)
                 else:
                     box.addWidget(pic)
                     box.addWidget(lbl)
@@ -942,14 +962,14 @@ class Picture(QWidget):
         else:
             box = QHBoxLayout(self)
             box.addWidget(pic)
-        
+
 
 class OutputBox(AutoEntry):
     def __init__(self, parent):
         AutoEntry.__init__(self, parent)
         self.setPalette(P.output_box)
         self.setReadOnly(1)
-           
+
 
 class Fonts(object): #custom Fonts
     def __init__(self):
@@ -958,10 +978,10 @@ class Fonts(object): #custom Fonts
         self.small = QFont("Verdana", 10)
         self.box = QFont("Courier New", 12, QFont.Bold)
         self.status = QFont("Arial", 12)
-        
+
 
 class Metrics(object): #custom font Metrics
-    def __init__(self):        
+    def __init__(self):
         self.box = QFontMetrics(F.box)
 
 
@@ -979,7 +999,7 @@ class Colors(object): #custom Colors
 
 
 class Palettes(object): #custom Palettes
-    def __init__(self):        
+    def __init__(self):
         self.normal = app.palette()
 
         self.normal.setColor(QPalette.Base, C.enabled)
@@ -1006,15 +1026,15 @@ class Palettes(object): #custom Palettes
 
         self.output_box = QPalette(self.normal) # copy normal palette
         self.output_box.setColor(QPalette.Base, C.disabled)
-    
+
         self.ready_text = QPalette(self.normal) # copy normal palette
         self.ready_text.setColor(QPalette.Foreground, C.std)
         self.ready_text.setColor(QPalette.Text, C.std)
-        
+
         self.err_text = QPalette(self.normal) # copy normal palette
         self.err_text.setColor(QPalette.Foreground, C.err)
         self.err_text.setColor(QPalette.Text, C.err)
-    
+
         self.entry_disabled = QPalette(self.normal) # copy normal palette
         self.entry_disabled.setColor(QPalette.Base, C.disabled)
         self.entry_disabled.setColor(QPalette.Text, QColor("black"))

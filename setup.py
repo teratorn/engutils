@@ -32,7 +32,7 @@ setup(name="EngUtils",
       package_data={'EngUtils' : ['icon.png',
                                   'version.txt']},
       scripts=['bin/engutils'],
-      install_requires=['PySide']
+      install_requires=['pyside2']
       )
 
 if sys.argv[1] == 'py2exe':
