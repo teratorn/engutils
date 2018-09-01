@@ -275,7 +275,7 @@ class NotebookPage(QTabWidget):
 
         if caption:
             cw = QWidget(w)
-	    w_layout.addWidget(cw)
+            w_layout.addWidget(cw)
             cl = QVBoxLayout(cw)
             lbl = QLabel(caption, cw)
             cl.addWidget(lbl, 0, Qt.AlignCenter|Qt.AlignTop)
