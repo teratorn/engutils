@@ -193,11 +193,13 @@ class CalculatorApp(QApplication):
         main.setFont( F.std )
         main.setWindowTitle(title)
 
-	iconPath = os.path.join(os.path.dirname(__file__), "icon.png")
+        iconPath = os.path.join(os.path.dirname(__file__), "icon.png")
         icon = QIcon(iconPath)
         main.setWindowIcon(icon)
 
         self.top = QTabWidget()
+        self.top.sizeHint = lambda: QSize(1280, 900)
+
         main.setCentralWidget(self.top)
 
         menuBar = main.menuBar()
@@ -218,6 +220,7 @@ class CalculatorApp(QApplication):
         aboutAction = helpMenu.addAction("&About...")
         aboutAction.setFont(F.std)
         connect(aboutAction, SIGNAL("triggered()"), showAboutDialog)
+
 
     def exec_(self):
         QTimer.singleShot(1000, self.checkFathersDay)

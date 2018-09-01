@@ -24,10 +24,10 @@ class U(object):  #these class attributes are common unit strings for use below
     SqIn = "(sq.in)"
     Acres = "(acres)"
     FtSec = "(ft/sec)"
-    FtLinFt = "(ft/lin.ft)"  
+    FtLinFt = "(ft/lin.ft)"
     InLbs = "(in-lbs)"
     GPM = "(gallons/min)"
-    CuFtSec = "(cu.ft/sec)"    
+    CuFtSec = "(cu.ft/sec)"
     PSI = "(psi)"
     Mins = "(minutes)"
     Percent = "%"
@@ -99,7 +99,7 @@ CalculatorPage(nb,
                 OutputLine("Pressure drop:", U.PSI),
                 OutputLine("Head loss:", U.Feet)
                 )
-    
+
 def pipeFlowCalc(dia, head_loss, length):
     dia = dia / 12  #convert to feet for calculations
     s = head_loss / length #head loss per foot of pipe
@@ -185,7 +185,7 @@ def drainCalc(K, b, drain_area, runoff_c, runoff_time, drain_length, elev_d, slo
             tpoint = (drain_length / 20) / Vavgpoint
             Vsum = Vpoint
             tsum = tsum + tpoint
-    
+
 
 
         if abs(runoff_time - (tsum / 60)) <= .001: break
@@ -199,7 +199,7 @@ def drainCalc(K, b, drain_area, runoff_c, runoff_time, drain_length, elev_d, slo
 
 
 CalculatorPage(app.top,
-               "Drainage",               
+               "Drainage",
 """SEE STD. HDBK. FOR CIVIL ENGINEERS, PG.21-9O FOR VALUES OF K & b. We live in Region 2,
 but Region 1 is not too far east of us, see the above reference for the appropriate Region.
                                Region 1:           Region 2:                                          Region 1:           Region 2:
@@ -221,7 +221,7 @@ For 10 yr storm:  K=300, b=36      K=230, b=29  |  For 100 yr storm:  K=367, b=3
                 OutputLine("Average overall stream velocity:", U.FtSec),
                 OutputLine("Runoff time:", U.Mins),
                 OutputLine("Assumed rainfall intensity:", U.InHrs),
-                OutputLine("Rainfall intensity:", U.InHrs),    
+                OutputLine("Rainfall intensity:", U.InHrs),
                 OutputLine("I ="),
                 OutputLine("K ="),
                 OutputLine("t ="),
@@ -253,7 +253,7 @@ def flowDepthCalcVchannel(flow, rough_c, grade_line_slope, left_slope, right_slo
     #calc. true length of left and right stream banks respectively
     while tryme > 0:
         d = d + add
-        
+
         L1 = d / sin(theta1)
         L2 = d / sin(theta2)
         #calc. width of left and right streams respectively
@@ -264,7 +264,7 @@ def flowDepthCalcVchannel(flow, rough_c, grade_line_slope, left_slope, right_slo
         R = Atotal / Length             #hydraulic radius
         #calc. the left side of the Manning eqn., AR^2/3
         left = Atotal * (R ** (2 / 3))
-        
+
         tryme = right - left
 
     return right, left, Atotal, flow/Atotal, d, h1, h2
@@ -301,14 +301,14 @@ def flowDepthCalcSqchannel(flow, rough_c, grade_line_slope, width):
     #calculate the area and wetted length for the hydraulic radius
     while tryme > 0:
         d = d + add
-        
+
         Area = d * width
         Length = (2 * d) + width
-        
+
         R = Area / Length             #hydraulic radius
         #calc. the left side of the Manning eqn., AR^2/3
         left = Area * (R ** (2 / 3))
-        
+
         tryme = right - left
 
     return Area, flow/Area, d
@@ -321,7 +321,7 @@ CalculatorPage(nb,
                 EntryLine("Roughness coefficient, n:"),
                 EntryLine("Slope of the energy grade line, S:", U.FtLinFt),
                 EntryLine("Width of channel:", U.Feet),
-                
+
 
 
                 OutputLine("Total stream area:", U.SqFt),
@@ -345,7 +345,7 @@ def flowDepthCalcTrapchannel(flow, rough_c, grade_line_slope, left_slope, right_
     #calc. true length of left and right stream banks respectively
     while tryme > 0:
         d = d + add
-        
+
         L1 = d / sin(theta1)
         L2 = d / sin(theta2)
         #calc. width of left and right streams respectively
@@ -357,7 +357,7 @@ def flowDepthCalcTrapchannel(flow, rough_c, grade_line_slope, left_slope, right_
         #calc. the left side of the Manning eqn., AR^2/3
         left = Atotal * (R ** (2 / 3))
         ChannelWidthTotal = width + h1 + h2
-        
+
         tryme = right - left
 
     return Atotal, flow/Atotal, d, h1, h2, ChannelWidthTotal
@@ -387,14 +387,14 @@ CalculatorPage(nb,
 def latLonCalc(lat1, lon1, lat2, lon2):
 
     lataverage = (lat1 + lat2) / 2
-    
+
     longradius = 20925722.4 * cos((pi / 180) * lataverage)
-    
+
     latdist = 2 * (20855551.2 * sin(((lat2 - lat1) * (pi / 180)) / 2))
     longdist = 2 * (longradius * sin(((lon1 - lon2) * (pi / 180)) / 2))
-    
+
     distance = ((latdist ** 2) + (longdist ** 2)) ** 0.5
-    
+
     if latdist == 0 and longdist == 0:
         bearing = 0
     elif longdist == 0 and latdist > 0:
@@ -407,7 +407,7 @@ def latLonCalc(lat1, lon1, lat2, lon2):
         bearing = 270
     else:
         angle = (180 * atan(abs(latdist) / abs(longdist))) / pi
-    
+
         if latdist > 0 and longdist > 0:
             bearing = 90 - angle
         if latdist < 0 and longdist > 0:
@@ -416,7 +416,7 @@ def latLonCalc(lat1, lon1, lat2, lon2):
             bearing = 270 - angle
         if latdist > 0 and longdist < 0:
             bearing = 270 + angle
-    
+
     return distance, bearing
 
 CalculatorPage(app.top,
@@ -433,16 +433,16 @@ CalculatorPage(app.top,
                 )
 
 
-    
+
 nb = NotebookPage(app.top, "Inertia")
 
 def rectPlateCalc(entry_table):
-    Io = a = ay = ay2 = 0       
+    Io = a = ay = ay2 = 0
     for y, width, height in entry_table:
         a = a + (width * height)
         ay = ay + ((width * height) * y)
         ay2 = ay2 + ((width * height) * (y ** 2))
-        Io = Io + ((width * (height ** 3)) / 12)  
+        Io = Io + ((width * (height ** 3)) / 12)
 
     Ybar = ay / a
     Ix = ay2 + Io - (a * (Ybar ** 2))
@@ -475,8 +475,8 @@ CalculatorPage(nb,
                "Irregular",
                "Irregular elements including plates at an angle",
                irregElemCalc,
-               EntryTable("Enter the Elements. One for each row.", "Y", "area", "Io"), 
-                          
+               EntryTable("Enter the Elements. One for each row.", "Y", "area", "Io"),
+
                OutputLine("Area = "),
                OutputLine("Ybar = "),
                OutputLine("Ix = ")
@@ -507,7 +507,7 @@ CalculatorPage(nb,
                OutputLine("Y from the lowest corner\nof the angled plate = "),
                OutputLine("Using Io = "),
                )
-    
+
 
 
 nb_known = NotebookPage(nb, "Known Shapes")
@@ -521,20 +521,20 @@ def iBeamCalc(height, u_width, u_thick, l_width, l_thick, web_thick):
     a3 = [ u_thick, height - u_thick - l_thick, l_thick ]
 
     a = ay = ay2 = Io = Ybar = Ix = 0
-    
+
     for i in range(3):
         a = a + ( a2[i] * a3[i] )
         ay = ay + ( ( a2[i] * a3[i] ) * a1[i] )
         ay2 = ay2 + ( ( a2[i] * a3[i] ) * ( a1[i] ** 2 ) )
         Io = Io + ( ( a2[i] * ( a3[i] ** 3 )) / 12)
-    
+
 
     Ybar = ay / a
     Ix = ay2 + Io - (a * (Ybar ** 2))
 
     return a, Ybar, Ix
 
-    
+
 CalculatorPage(nb_known,
                "I-Beam Sect.",
                "",
@@ -553,26 +553,26 @@ CalculatorPage(nb_known,
 
 
 def cSectionCalc(height, u_width, u_thick, l_width, l_thick, web_thick):
-                    
+
     a1 = [ height - (u_thick / 2), ((height - u_thick - l_thick) / 2) + l_thick, l_thick / 2 ]
     a2 = [ u_width, web_thick, l_width ]
     a3 = [ u_thick, height - u_thick - l_thick, l_thick ]
 
     a = ay = ay2 = Io = Ybar = Ix = 0
-    
+
     for i in range(3):
         a = a + ( a2[i] * a3[i] )
         ay = ay + ( ( a2[i] * a3[i] ) * a1[i] )
         ay2 = ay2 + ( ( a2[i] * a3[i] ) * ( a1[i] ** 2 ) )
         Io = Io + ( ( a2[i] * ( a3[i] ** 3 )) / 12)
-    
+
 
     Ybar = ay / a
     Ix = ay2 + Io - (a * (Ybar ** 2))
 
     return a, Ybar, Ix
 
-    
+
 CalculatorPage(nb_known,
                "C Sect.",
                "",
@@ -591,7 +591,7 @@ CalculatorPage(nb_known,
 
 
 def angledSectionCalc(v_length, v_thick, h_length, h_thick):
-    
+
     a = ay = ay2 = Io = Ybar = Ix = 0
 
     a1 = [ v_length / 2, h_thick / 2 ]
@@ -606,7 +606,7 @@ def angledSectionCalc(v_length, v_thick, h_length, h_thick):
 
     Ybar = ay / a
     Ix = ay2 + Io - (a * (Ybar ** 2))
-    
+
     return a, Ybar, Ix
 
 CalculatorPage(nb_known,
@@ -722,7 +722,7 @@ CalculatorPage(nb,
 #equal to the number of entry objects defined below
 def circularCulvertCalc(a, b, c):
     return a+b+c, 50
-    
+
 
 def distBearingCalc(x1, y1, x2, y2, angle_shim):
 
@@ -734,7 +734,7 @@ def distBearingCalc(x1, y1, x2, y2, angle_shim):
     theta = asin(ydiff / dist) * (180.0/pi);
 
     if x2 <= x1:  #upper left quadrant
-        theta += 270.0     
+        theta += 270.0
     elif x2 > x1:
         theta = 90.0 - theta
 
