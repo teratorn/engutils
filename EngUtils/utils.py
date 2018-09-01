@@ -33,7 +33,7 @@ class U(object):  #these class attributes are common unit strings for use below
     Percent = "%"
     InHrs = "(in/hrs)"
     DegMinSec = "(ex. 10d20'30\")"
-    Degrees = "°"
+    Degrees = "Â°"
 
 pvc_factor = 140
 

@@ -15,7 +15,10 @@ except ImportError:
 
 
 import os.path
-from ConfigParser import ConfigParser
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
 
 entry_width = 4
 app = F = M = C = P = icon = None
@@ -414,17 +417,17 @@ class CalculatorPage(QWidget):
                 results = (results,)
             #check the lenght of results to ensure we got a value for each output box
             if len(results) != len(self._outputs):
-                raise TypeError, "Error: Calculation function returned %s values (expected %s)" % (len(results), len(self._outputs))
+                raise TypeError("Error: Calculation function returned %s values (expected %s)" % (len(results), len(self._outputs)))
 
             #tell the output objects to display the results
             for i in range(len(results)):
                 self._outputs[i].setValue( results[i] )
                 self._outputs[i].enableCopyButton()
 
-        except Exception, e:
+        except Exception as e:
             self.statusLine.setText(e.__class__.__name__+": "+str(e))
             self.statusLine.setPalette(P.err_text)
-            print traceback.format_exc()
+            print(traceback.format_exc())
             return
 
         #disable the entry boxes until the New button is clicked
@@ -536,9 +539,9 @@ def smartEval(s):
 
 class AutoEntry(QLineEdit):  #a line entry that has a minimum width (in characters), and expands when that is exceeded by typed in text
     def __init__(self, *args, **kwargs): # width=default, font=BoxFont
-        apply(QLineEdit.__init__, (self,) + args)
+        QLineEdit.__init__(self, *args)
 
-        if kwargs.has_key("width"):
+        if "width" in kwargs:
             self._minwidth_chars = kwargs["width"]
         else:
             self._minwidth_chars = entry_width
@@ -899,7 +902,7 @@ class EntryTable(Entry, QTableWidget):
             l = []
             for col in range(self._num_cols):
                 item = self.item(row,col)
-                if not item: raise ValueError, err_string
+                if not item: raise ValueError(err_string)
                 l.append( smartEval( str(item.text()) ) )
             r.append( tuple(l) )
         return tuple(r)
@@ -934,12 +937,12 @@ class Picture(QWidget):
         self.orient = orient
 
     def postInit(self, parent):
-	self.setParent(parent)
+        self.setParent(parent)
 
         pix = QPixmap()
         if not pix.load(self.file_name):
             if not pix.load( "images/" + self.file_name ):
-                print "Load of image, %s, failed!" % self.file_name
+                print("Load of image, %s, failed!" % self.file_name)
                 return
         pic = QLabel(self)
         pic.setPixmap(pix)

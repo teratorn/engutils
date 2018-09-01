@@ -1,7 +1,12 @@
 import EngUtils
 
-from EngUtils.ez_setup import use_setuptools
-use_setuptools()
+try:
+    # was used for older Python's where setuptools
+    # wasn't readily available by default
+    from EngUtils.ez_setup import use_setuptools
+    use_setuptools()
+except:
+    pass
 from setuptools import setup
 
 import shutil
