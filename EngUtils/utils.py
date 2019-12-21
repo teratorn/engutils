@@ -7,7 +7,7 @@ from EngUtils.common import EntryTable, OutputLine
 
 import os.path
 
-from math import pi, sin, cos, tan, atan, asin, acos, sqrt
+from math import pi, sin, cos, tan, atan, asin, acos
 
 thisDir = os.path.dirname(__file__)
 VERSION_FILE_PATH = os.path.join(thisDir, 'version.txt')
@@ -34,8 +34,9 @@ class U(object):  #these class attributes are common unit strings for use below
     InHrs = "(in/hrs)"
     DegMinSec = "(ex. 10d20'30\")"
     Degrees = "°"
+    Radians = "(Radians)"
 
-pvc_factor = 140
+pvc_factor = 150
 
 app = CalculatorApp("Engineering Utilities %s" % (PROGRAM_VERSION,))
 
@@ -246,7 +247,7 @@ def flowDepthCalcVchannel(flow, rough_c, grade_line_slope, left_slope, right_slo
     theta1 = atan(left_slope / 100)
     theta2 = atan(right_slope / 100)
 
-    d = .1  #first guess for depth
+    d = .001  #first guess for depth
     add = .001
 
     tryme = 1
@@ -294,7 +295,7 @@ def flowDepthCalcSqchannel(flow, rough_c, grade_line_slope, width):
     #calculate the right side of the Manning eqn.
     right = (flow * rough_c) / (1.486 * (grade_line_slope ** .5))
 
-    d = .1  #first guess for depth
+    d = .001  #first guess for depth
     add = .001
 
     tryme = 1
@@ -338,7 +339,7 @@ def flowDepthCalcTrapchannel(flow, rough_c, grade_line_slope, left_slope, right_
     theta1 = atan(left_slope / 100)
     theta2 = atan(right_slope / 100)
 
-    d = .1  #first guess for depth
+    d = .001  #first guess for depth
     add = .001
 
     tryme = 1
@@ -370,18 +371,183 @@ CalculatorPage(nb,
                 EntryLine("Total flow, Q:", U.CuFtSec),
                 EntryLine("Roughness coefficient, n:"),
                 EntryLine("Slope of the energy grade line, S:", U.FtLinFt),
-                EntryLine("Slope of the left stream bank lkg. upstream, SlpL:", U.Percent),
-                EntryLine("Slope of the right stream bank lkg. upstream: SlpR", U.Percent),
-                EntryLine("Width of flat channel bottom, w:", U.Feet),
+                EntryLine("Slope of the left stream bank lkg. upstream:", U.Percent),
+                EntryLine("Slope of the right stream bank lkg. upstream:", U.Percent),
+                EntryLine("Width of flat channel bottom:", U.Feet),
 
 
                 OutputLine("Total stream area:", U.SqFt),
                 OutputLine("Average stream velocity:", U.FtSec),
-                OutputLine("Total stream depth, D:", U.Feet),
-                OutputLine("Width of the left sloped side of\nthe stream looking upstream, wL:", U.Feet),
-                OutputLine("Width of the right sloped side of\nthe stream looking upstream, wR:", U.Feet),
-                OutputLine("Total channel width, W:", U.Feet)
+                OutputLine("Total stream depth:", U.Feet),
+                OutputLine("Width of the left sloped side of\nthe stream looking upstream:", U.Feet),
+                OutputLine("Width of the right sloped side of\nthe stream looking upstream:", U.Feet),
+                OutputLine("Total channel width:", U.Feet)
                 )
+
+
+def flowDepthCalcCurbedStreet(Q, n, s, cg, w, ch):
+
+
+    #This page calculates the depth of flow down a typical curbed street. The street is assumed to be symmetrical about its
+    #centerline with an equal amount of flow on each side of center. Street is assumed to have a linear slope downward from the
+    #crown to the curb.
+    #Q is the total flow, cfs
+    #n is the manning roughness coefficient, dimensionless
+    #s is the slope of the energy grade line, ft./ft.
+    #cg is the grade of the curb in cross-section, %
+    #w is the width of the street between curbs, ft.
+    #ch is the crown height at the street centerline, ft.
+    #The equation to be used is: Q = 1.486 x A x R^2/3 x s^1/2 / n
+    #The depth "d" will be increased by 0.001 ft. per try until the right side of the equation balances with "Q"
+
+    d = .001    #first guess for depth
+    add = .001  #step value for each try
+
+    tryme = 1   # set initial value
+
+    while tryme > 0:
+
+        d = d + add
+
+        sg = 100 * (ch / (w / 2))                      #street grade from crown to curb in %
+        a = 100 * d / cg                               #horizontal projected length of wetted curb on one side of the street
+        wct = 2 * (((d ** 2) + (a ** 2)) ** (1 / 2))   #calculaction of the total wetted curb on both sides of street
+
+        if d <= ch:
+            b = 100 * d / sg                               #horizontal projected length of wetted street on one side of the street
+            wst = 2 * (((d ** 2) + (b ** 2)) ** (1 / 2))   #calculation of the total wetted street on both sides of street when d <= ch
+            A = (d * a) + (d * b)                          #calculation of total cross-sectional area of flow when d <= ch
+
+        else:
+            wst = 2 * (((ch ** 2) + ((w / 2) ** 2)) ** (1 / 2))   #calculation of the total wetted street on both sides of street when d > ch
+            A = (d * a) + (w * (d - (ch / 2)))                    #calculation of total cross-sectional area of flow when d > ch
+
+        wpt = wct + wst    #total wetted perimeter, curbs and street
+        R = A / wpt        #calculation of hydraulic radius
+        right = (1.486 * A) * (R ** (2 / 3)) * (s ** (1 / 2)) / n   #calculation of right side of equation for Q shown in the explanation above
+        V = Q / A                                                   #calculation of average stream velocity
+
+        tryme = Q - right
+
+    return d, A, V
+
+CalculatorPage(nb,
+               "Curbed Street",
+               "This program assumes a linear street slope from crown to curb.",
+               flowDepthCalcCurbedStreet,
+               EntryLine("Total flow, Q:", U.CuFtSec),
+               EntryLine("Roughness coefficient, n:"),
+               EntryLine("Slope of the energy grade line, S:", U.FtLinFt),
+               EntryLine("Grade of curbs:", U.Percent),
+               EntryLine("Width of street between curbs:", U.Feet),
+               EntryLine("Street crown height:", U.Feet),
+
+
+               OutputLine("Total stream depth:", U.Feet),
+               OutputLine("Total stream area:", U.SqFt),
+               OutputLine("Average stream velocity:", U.FtSec)
+               )
+
+
+
+def flowDepthCalcUchannel(Q, n, s, rad):
+
+    #This page calculates the flow depth of a "U" shaped channel.  The channel cross-section has a
+    #semicircular bottom and vertical side walls.
+    #Q is the total flow, cfs.
+    #n is the manning roughness coefficient, dimensionless
+    #s is the slope of the energy grade line, ft./ft.
+    #rad is the radius of the hemispherical bottom of the channel cross-section, ft.
+    # The equation to be used is: Q = 1.486 x A x R^2/3 x s^1/2 / n
+
+    d = .001
+    add = .001
+    tryme = 1
+
+    while tryme > 0:
+
+        d = d + add
+
+        if d <= rad:
+            theta = acos((rad - d) / rad)
+            asec = theta * (rad ** 2)
+            at = (rad * sin(theta)) * (rad - d)
+            A = asec - at                                #Total flow area if water depth is <= radius of channel bottom
+            wpt = 2 * theta * rad                      # Total wetted perimeter if water depth is <= radius of channel bottom
+
+        else:
+            A = ((pi * (rad ** 2)) / 2) + ((d - rad) * (2 * rad))     #Total flow area if water depth > radius of channel bottom
+            wpt = (pi * rad) + (2 * (d - rad))                        #Total wetted perimeter if water depth > radius of channel bottom
+
+        R = A / wpt
+        right = (1.486 * A) * (R ** (2 / 3)) * (s ** (1 / 2)) / n    # calculation of right side of equation for Q shown in the explanation above
+        V = Q / A                                                    # calculation of average stream velocity
+        tryme = Q - right
+
+    return d, A, V
+
+CalculatorPage(nb,
+               "U Shaped Channel",
+               "For a channel with a semicircular bottom and vertical side walls",
+               flowDepthCalcUchannel,
+               EntryLine("Total flow, Q:", U.CuFtSec),
+               EntryLine("Roughness coefficient, n:"),
+               EntryLine("Slope of the energy grade line, S:", U.FtLinFt),
+               EntryLine("Radius of channel bottom:", U.Feet),
+
+
+               OutputLine("Total stream depth:", U.Feet),
+               OutputLine("Total stream area:", U.SqFt),
+               OutputLine("Average stream velocity:", U.FtSec)
+               )
+
+
+def flowDepthCalcCircularChan(Q, n, s, rad):
+
+    #This page calculates the flow depth for a circular closed channel flowing partially full.
+    # Q is the total flow, cfs.
+    # n is the manning roughness coefficient, dimensionless
+    # s is the slope of the energy grade line, ft./ft.
+    # rad is the inside radius of the channel cross-section, ft.
+    # The equation to be used is: Q = 1.486 x A x R^2/3 x s^1/2 / n
+
+    theta = 0.0001
+    add = 0.00001
+    tryme = 1
+
+    while tryme > 0:
+
+        theta = theta + add
+
+        if theta > 3.141592654:
+            raise ValueError("Depth of water exceeds diameter of channel")
+
+        A = (rad ** 2) * (theta - (sin(theta) * cos(theta)))
+
+        d = rad * (1 - cos(theta))
+        wpt = 2 * theta * rad
+        R = A / wpt
+        V = Q / A
+        right = (1.486 * A) * (R ** (2 / 3)) * (s ** (1 / 2)) / n
+        tryme = Q - right
+
+    return d, A, V
+
+CalculatorPage(nb,
+               "Circular Channel",
+               "For channel with circular cross-section.\nResults not valid if depth exceeds channel diameter",
+               flowDepthCalcCircularChan,
+               EntryLine("Total flow, Q:", U.CuFtSec),
+               EntryLine("Roughness coefficient, n:"),
+               EntryLine("Slope of the energy grade line, S:", U.FtLinFt),
+               EntryLine("Inside radius of channel:", U.Feet),
+
+
+               OutputLine("Total stream depth:", U.Feet),
+               OutputLine("Total stream area:", U.SqFt),
+               OutputLine("Average stream velocity:", U.FtSec)
+               )
+
 
 
 def latLonCalc(lat1, lon1, lat2, lon2):
@@ -724,21 +890,6 @@ def circularCulvertCalc(a, b, c):
     return a+b+c, 50
 
 
-def distBearingCalc(x1, y1, x2, y2, angle_shim):
-
-    xdiff = x2-x1
-    ydiff = y2-y1
-
-    dist = sqrt(xdiff ** 2.0 + ydiff **2.0)
-
-    theta = asin(ydiff / dist) * (180.0/pi);
-
-    if x2 <= x1:  #upper left quadrant
-        theta += 270.0
-    elif x2 > x1:
-        theta = 90.0 - theta
-
-    return (theta+angle_shim, dist)
 
 # General Parameters for the CalculatorPage constructor:
 # 1) parent, the notebook widget to attach to
@@ -762,19 +913,6 @@ CalculatorPage(app.top,
                 )
 # ----- End Conc. Beam definition -----
 
-CalculatorPage(app.top,
-               "Distance &Bearing",
-               "Calculate distance and bearing between two xy points.",
-                distBearingCalc,
-                EntryLine("x1"),
-                EntryLine("y1"),
-                EntryLine("x2"),
-                EntryLine("y2"),
-                EntryLine("Bearing adj. (added to result)", default="0.0"),
-
-                OutputLine("bearing"),
-                OutputLine("distance")
-                )
 
 def run():
     app.exec_() # this function never returns until the program is terminated
