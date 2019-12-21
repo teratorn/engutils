@@ -3,18 +3,12 @@ from __future__ import division  # this causes interger division to return a flo
                                  # number instead of throwing away the remainder, if any.
 
 from EngUtils.common import CalculatorApp, NotebookPage, CalculatorPage, EntryLine
-from EngUtils.common import EntryTable, OutputLine
+from EngUtils.common import EntryTable, OutputLine, PROGRAM_VERSION
 
 import os.path
 
 from math import pi, sin, cos, tan, atan, asin, acos
 
-thisDir = os.path.dirname(__file__)
-VERSION_FILE_PATH = os.path.join(thisDir, 'version.txt')
-
-with open(VERSION_FILE_PATH, 'r') as f:
-    PROGRAM_VERSION = f.read().strip()
-    f.close()
 
 #some constants, there are more at the bottom of this file
 class U(object):  #these class attributes are common unit strings for use below

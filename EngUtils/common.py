@@ -20,6 +20,12 @@ try:
 except ImportError:
     from ConfigParser import ConfigParser
 
+thisDir = os.path.dirname(__file__)
+VERSION_FILE_PATH = os.path.join(thisDir, 'version.txt')
+
+with open(VERSION_FILE_PATH, 'r') as f:
+    PROGRAM_VERSION = f.read().strip()
+
 entry_width = 4
 app = F = M = C = P = icon = None
 err_string = "Bad Input"
@@ -148,7 +154,15 @@ class Configuration(object):
 
 
 def showAboutDialog():
-    msgBox = MsgBox(MsgBox.NoIcon, u"Engineering Utilities - About", u"Written by Eric P. Mangold - teratorn@gmail.com\n\nPlease contact for commercial licensing.")
+    # thwart scrapers
+    import base64
+    email = base64.decodestring(b'dGVyYXRvcm5Aem9oby5jb20=\n').decode('utf-8')
+    print(type(PROGRAM_VERSION))
+    msgBox = MsgBox(MsgBox.NoIcon, u"Engineering Utilities - About",
+                    u"Written by Eric P. Mangold  --  {}\n\n"
+                    u"Version: {}\n\n"
+                    u"Please contact for commercial licensing."
+                    .format(email, PROGRAM_VERSION))
     msgBox.exec_()
 
 
