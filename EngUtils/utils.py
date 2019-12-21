@@ -247,7 +247,7 @@ def flowDepthCalcVchannel(flow, rough_c, grade_line_slope, left_slope, right_slo
     tryme = 1
     #calc. true length of left and right stream banks respectively
     while tryme > 0:
-        d = d + add
+        d += add
 
         L1 = d / sin(theta1)
         L2 = d / sin(theta2)
@@ -295,7 +295,7 @@ def flowDepthCalcSqchannel(flow, rough_c, grade_line_slope, width):
     tryme = 1
     #calculate the area and wetted length for the hydraulic radius
     while tryme > 0:
-        d = d + add
+        d += add
 
         Area = d * width
         Length = (2 * d) + width
@@ -339,7 +339,7 @@ def flowDepthCalcTrapchannel(flow, rough_c, grade_line_slope, left_slope, right_
     tryme = 1
     #calc. true length of left and right stream banks respectively
     while tryme > 0:
-        d = d + add
+        d += add
 
         L1 = d / sin(theta1)
         L2 = d / sin(theta2)
@@ -401,7 +401,7 @@ def flowDepthCalcCurbedStreet(Q, n, s, cg, w, ch):
 
     while tryme > 0:
 
-        d = d + add
+        d += add
 
         sg = 100 * (ch / (w / 2))                      #street grade from crown to curb in %
         a = 100 * d / cg                               #horizontal projected length of wetted curb on one side of the street
@@ -460,7 +460,7 @@ def flowDepthCalcUchannel(Q, n, s, rad):
 
     while tryme > 0:
 
-        d = d + add
+        d += add
 
         if d <= rad:
             theta = acos((rad - d) / rad)
@@ -513,7 +513,7 @@ def flowDepthCalcCircularChan(Q, n, s, rad):
 
         theta = theta + add
 
-        if theta > 3.141592654:
+        if theta > pi:
             raise ValueError("Depth of water exceeds diameter of channel")
 
         A = (rad ** 2) * (theta - (sin(theta) * cos(theta)))
