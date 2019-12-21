@@ -18,10 +18,10 @@ def exit(code):
     print "Press Enter to continue..."
     raw_input() # wait for Enter key press
     sys.exit(code)
-    
+
 try:
     subprocess.check_call([sys.executable, 'setup.py', 'py2exe'])
-    
+
 except subprocess.CalledProcessError:
     print "Error running py2exe"
     print "Failed to build installer..."
