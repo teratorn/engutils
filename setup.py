@@ -1,18 +1,20 @@
 import EngUtils
 
 try:
+    from setuptools import setup
+except ImportError:
     # was used for older Python's where setuptools
     # wasn't readily available by default
     from EngUtils.ez_setup import use_setuptools
     use_setuptools()
-except:
-    pass
-from setuptools import setup
+    from setuptools import setup
 
 import shutil
 import glob
 import os.path
 import sys
+
+# TODO: why try to import this here?
 try:
     import py2exe
 except ImportError:
