@@ -7,7 +7,7 @@ from EngUtils.common import EntryTable, OutputLine, PROGRAM_VERSION
 
 import os.path
 
-from math import pi, sin, cos, tan, atan, asin, acos
+from math import pi, sin, cos, tan, atan, asin, acos, sqrt
 
 
 #some constants, there are more at the bottom of this file
@@ -877,6 +877,36 @@ CalculatorPage(nb,
                OutputLine("fb = ", U.PSI)
                )
 
+
+def distBearingCalc(x1, y1, x2, y2, angle_shim):
+
+    xdiff = x2-x1
+    ydiff = y2-y1
+
+    dist = sqrt(xdiff ** 2.0 + ydiff **2.0)
+
+    theta = asin(ydiff / dist) * (180.0/pi);
+
+    if x2 <= x1:  #upper left quadrant
+        theta += 270.0
+    elif x2 > x1:
+        theta = 90.0 - theta
+
+    return (theta+angle_shim, dist)
+
+CalculatorPage(app.top,
+               "Distance && Bearing",
+               "Calculate distance and bearing between two xy points.",
+                distBearingCalc,
+                EntryLine("x1"),
+                EntryLine("y1"),
+                EntryLine("x2"),
+                EntryLine("y2"),
+                EntryLine("Bearing adj. (added to result)", default="0.0"),
+
+                OutputLine("bearing", U.Degrees),
+                OutputLine("distance")
+                )
 
 #called when the Calculate button is clicked, takes a number of arguments
 #equal to the number of entry objects defined below
