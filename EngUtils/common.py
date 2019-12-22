@@ -157,7 +157,6 @@ def showAboutDialog():
     # thwart scrapers
     import base64
     email = base64.decodestring(b'dGVyYXRvcm5Aem9oby5jb20=\n').decode('utf-8')
-    print(type(PROGRAM_VERSION))
     msgBox = MsgBox(MsgBox.NoIcon, u"Engineering Utilities - About",
                     u"Written by Eric P. Mangold  --  {}\n\n"
                     u"Version: {}\n\n"
