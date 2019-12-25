@@ -14,17 +14,11 @@ import glob
 import os.path
 import sys
 
-# TODO: why try to import this here?
-try:
-    import py2exe
-except ImportError:
-    pass
-
 pkgDir = os.path.dirname(EngUtils.__file__)
 with open(os.path.join(pkgDir, 'version.txt'), 'r') as f:
     versionString = f.read().strip()
 
-setup(name="EngUtils",
+setup(name="EngineeringUtilities",
       version=versionString,
       description="GUI calculation screens for various Engineering functions",
       author="Eric P. Mangold",
@@ -33,31 +27,9 @@ setup(name="EngUtils",
       windows=[{'script' : 'main.py',
                 'icon_resources' : [(1, 'icon.ico')]
                 }],
-      options = {"py2exe": {"skip_archive":1}},
 
-      # not respected by py2exe for some reason
       package_data={'EngUtils' : ['icon.png',
                                   'version.txt']},
       scripts=['bin/engutils'],
       install_requires=['pyside2']
       )
-
-if sys.argv[1] == 'py2exe':
-    for name in glob.glob('EngUtils/*.py'):
-        shutil.copyfile(name, os.path.join('dist', name))
-
-    icon = 'EngUtils/icon.png'
-    shutil.copyfile(icon, os.path.join('dist', icon))
-
-    icon = 'icon.ico'
-    shutil.copyfile(icon, os.path.join('dist', icon))
-
-    lic = 'LICENSE.txt'
-    shutil.copyfile(lic, os.path.join('dist', lic))
-
-    version_file = 'EngUtils/version.txt'
-    shutil.copyfile(version_file, os.path.join('dist', version_file))
-
-    shutil.move('dist/main.exe', 'dist/EngUtils.exe')
-    shutil.copyfile('msvcp90.dll', 'dist/msvcp90.dll')
-

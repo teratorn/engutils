@@ -23,8 +23,12 @@ except ImportError:
 thisDir = os.path.dirname(__file__)
 VERSION_FILE_PATH = os.path.join(thisDir, 'version.txt')
 
-with open(VERSION_FILE_PATH, 'r') as f:
-    PROGRAM_VERSION = f.read().strip()
+PROGRAM_VERSION = ""
+try:
+    with open(VERSION_FILE_PATH, 'r') as f:
+        PROGRAM_VERSION = f.read().strip()
+except IOError:
+    pass
 
 entry_width = 4
 app = F = M = C = P = icon = None
