@@ -110,12 +110,10 @@ class Configuration(object):
 
         with open(self.configPath, 'r') as f:
             cfg = ConfigParser()
-            cfg.readfp(f)
+            cfg.read_file(f)
 
             if cfg.has_section(self.section):
                 self.floatPrecision = cfg.getint(self.section, "floatPrecision")
-
-            f.close()
 
     def save(self):
         """
@@ -132,10 +130,9 @@ class Configuration(object):
             if not cfg.has_section(self.section):
                 cfg.add_section(self.section)
 
-            cfg.set(self.section, "floatPrecision", self.floatPrecision)
+            cfg.set(self.section, "floatPrecision", str(self.floatPrecision))
 
             cfg.write(f)
-            f.close()
 
     def promptFloatPrecision(self):
         """
