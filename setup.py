@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+
+#
+# EngUtils is a GUI application (Windows/Linux/Mac/etc) for performing common engineering-related tasks,
+# including structural and civil engineering calculations (solutions).
+# EngUtils contains "Calculation Sheets", which are just simple exposed Python functions that accepts Y number of inputs,
+# and returns (a tuple of) X number of outputs. Just defining that function, and connecting to the GUI object,
+# is enough to expose a new Tab in the GUI which will contain the text descriptions for all your variables (inputs and outputs).
+# Nothing else is required to add additional logic to EngUtils.
+# 
+
 import EngUtils
 
 try:
